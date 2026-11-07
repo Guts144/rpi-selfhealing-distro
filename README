@@ -1,0 +1,142 @@
+# Raspberry Pi 4 Self-Healing Yocto Distribution (RAUC A/B + HiveMQ AI Agent)
+
+An industrial-grade Yocto embedded distribution targeting **Raspberry Pi 4 (64-bit)** with an autonomous C++ network self-healing agent, HiveMQ MQTT telemetry, and atomic Over-The-Air (OTA) updates using RAUC dual-bank A/B partitioning.
+
+---
+
+## Architecture Overview
+
+```
+                      +---------------------------------------+
+                      |       Ubuntu ThinkPad (PC Agent)      |
+                      |  - Anomaly Detection (AI Engine)      |
+                      |  - Live Health & Telemetry Dashboard   |
+                      |  - Built-in HTTP OTA Bundle Server    |
+                      +-------------------+-------------------+
+                                          |
+                                    HiveMQ Broker
+                              (broker.hivemq.com:1883)
+                                          |
+                      +-------------------+-------------------+
+                      |      Raspberry Pi 4 (Embedded Node)   |
+                      |                                       |
+                      |  [Native C++ Local Agent]             |
+                      |   - Auto Network Healer (wpa_cli,     |
+                      |     DHCP renew, interface bounce)     |
+                      |   - Hardware Telemetry (Temp, RAM)    |
+                      |   - RAUC Slot Watchdog & 'mark-good'  |
+                      |                                       |
+                      |  [U-Boot + RAUC A/B Storage Engine]   |
+                      |   - Slot A: /dev/mmcblk0p2 (Active)   |
+                      |   - Slot B: /dev/mmcblk0p3 (Fallback) |
+                      |   - Data:   /dev/mmcblk0p4 (Persist)  |
+                      +---------------------------------------+
+```
+
+---
+
+## Directory Structure
+
+```
+rpi-selfhealing-distro/
+├── layers/
+│   ├── poky/                     # Yocto Core & BitBake (Scarthgap)
+│   ├── meta-raspberrypi/         # Raspberry Pi 4 BSP layer
+│   ├── meta-openembedded/        # Core, Networking, and Python libraries
+│   ├── meta-rauc/                # Robust Auto-Update Controller
+│   └── meta-selfhealing/         # Custom Distro Layer
+│       ├── conf/layer.conf
+│       ├── recipes-core/
+│       │   ├── images/selfhealing-image.bb
+│       │   ├── bundles/selfhealing-bundle.bb
+│       │   ├── local-agent/      # Native C++ self-healing daemon
+│       │   │   ├── local-agent_1.0.bb
+│       │   │   └── files/        # CMakeLists.txt, C++ sources, systemd unit
+│       │   ├── rauc/             # system.conf & CA certificates
+│       │   └── base-files/       # Persistent /data mount configuration
+│       ├── recipes-bsp/
+│       │   ├── rpi-u-boot-scr/   # RAUC boot script for U-Boot
+│       │   └── u-boot/           # fw_env.config for userspace RAUC
+│       ├── recipes-connectivity/
+│       │   └── wpa-supplicant/   # Multi-SSID fallback Wi-Fi config
+│       └── wic/
+│           └── sdimage-dual-raspberrypi.wks
+├── scripts/
+│   ├── setup-workspace.sh        # Automates workspace setup on Ubuntu
+│   └── generate-rauc-keys.sh     # Generates OpenSSL RSA keys for RAUC
+└── pc-agent/
+    ├── agent.py                  # AI Agent console on ThinkPad
+    └── requirements.txt
+```
+
+---
+
+## Quick Start on Your Ubuntu machie
+
+### Step 1: Copy/Sync the Workspace
+Copy this directory to your ThinkPad:
+```bash
+# E.g., via rsync or git
+cp -r rpi-selfhealing-distro ~/
+cd ~/rpi-selfhealing-distro
+```
+
+### Step 2: Initialize Workspace & Layers
+```bash
+chmod +x scripts/*.sh
+./scripts/setup-workspace.sh
+```
+
+### Step 3: Build the SD Card Image & Initial RAUC Bundle
+```bash
+cd ~/rpi-selfhealing-distro/build
+source ../layers/poky/oe-init-build-env .
+
+# 1. Build initial dual-bank SD card image (~1.5 hours on modern CPU)
+bitbake selfhealing-image
+
+# 2. Build the OTA update bundle (.raucb)
+bitbake selfhealing-bundle
+```
+
+The output files will be in:
+`tmp/deploy/images/raspberrypi4-64/`
+- `selfhealing-image-raspberrypi4-64.wic.bz2` -> Flash to SD card using `bmaptool` or BalenaEtcher.
+- `selfhealing-bundle-raspberrypi4-64.raucb` -> Signed OTA update file.
+
+---
+
+## Flash & Initial Boot
+
+1. Insert SD card into ThinkPad and flash:
+   ```bash
+   cd ~/rpi-selfhealing-distro/build/tmp/deploy/images/raspberrypi4-64/
+   bmaptool copy selfhealing-image-raspberrypi4-64.rootfs.wic.bz2 /dev/sdX
+   ```
+2. Insert SD card into Raspberry Pi 4 and boot.
+3. The board boots into **Slot A**, loads `local-agent`, connects to Wi-Fi, and reaches HiveMQ.
+
+---
+
+## Running the ThinkPad PC AI Agent
+
+```bash
+cd ~/rpi-selfhealing-distro/pc-agent
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python3 agent.py
+```
+
+### Performing an Over-The-Air (OTA) Update
+1. Make changes to any recipe in `meta-selfhealing` (e.g. update C++ agent or install new tool).
+2. Re-generate bundle:
+   ```bash
+   bitbake selfhealing-bundle
+   ```
+3. In `agent.py` console on ThinkPad:
+   ```text
+   ai-agent> host ../build/tmp/deploy/images/raspberrypi4-64/
+   ai-agent> ota http://<THINKPAD_IP>:8080/selfhealing-bundle-raspberrypi4-64.raucb
+   ```
+4. The Raspberry Pi 4 downloads the bundle, writes it to **Slot B**, reboots atomically into Slot B, and verifies system health before marking Slot B good. If Slot B fails to boot, U-Boot automatically falls back to Slot A!

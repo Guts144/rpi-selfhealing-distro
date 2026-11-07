@@ -1,0 +1,17 @@
+[Unit]
+Description=Raspberry Pi 4 Native Self-Healing Diagnostic & Telemetry Agent
+After=network.target dbus.service rauc.service
+Wants=network.target
+
+[Service]
+Type=notify
+ExecStart=/usr/bin/local-agent
+Restart=always
+RestartSec=5s
+WatchdogSec=30s
+EnvironmentFile=-/etc/default/local-agent
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

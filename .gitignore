@@ -1,0 +1,173 @@
+# =============================================================================
+# rpi-selfhealing-distro .gitignore
+# =============================================================================
+
+# =============================================================================
+# Yocto / BitBake — external layers (cloned by setup-workspace.sh)
+# =============================================================================
+layers/poky/
+layers/meta-raspberrypi/
+layers/meta-openembedded/
+layers/meta-rauc/
+
+# =============================================================================
+# Yocto build directory
+# =============================================================================
+
+# The entire tmp/ tree (compiled objects, rootfs, images, sstate, work dirs)
+build/tmp/
+
+# Yocto shared state cache (very large, fully reproducible)
+build/sstate-cache/
+
+# Downloads cache (source tarballs, git mirrors)
+downloads/
+
+# BitBake lock/pid files and run artifacts
+build/bitbake.lock
+build/bitbake.sock
+build/pseudodone
+build/.lock-*
+
+# Auto-generated build configuration
+build/conf/local.conf
+build/conf/bblayers.conf
+
+# Sanity check cache
+build/cache/
+
+# =============================================================================
+# RAUC signing keys and certificates (NEVER commit private keys)
+# =============================================================================
+layers/meta-selfhealing/recipes-core/rauc/files/ca.key
+layers/meta-selfhealing/recipes-core/rauc/files/ca.crt
+layers/meta-selfhealing/recipes-core/rauc/files/signing.key
+layers/meta-selfhealing/recipes-core/rauc/files/signing.crt
+layers/meta-selfhealing/recipes-core/rauc/files/*.pem
+layers/meta-selfhealing/recipes-core/rauc/files/*.p12
+scripts/rauc-keys/
+
+# =============================================================================
+# Sensitive configuration
+# =============================================================================
+# Constants.txt files contain real credentials:
+layers/meta-selfhealing/recipes-core/local-agent/files/constants.txt
+pc-agent/constants.txt
+
+# =============================================================================
+# Python (PC companion agent)
+# =============================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+
+# Virtual environments
+pc-agent/.venv/
+pc-agent/venv/
+pc-agent/env/
+.venv/
+venv/
+env/
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+.eggs/
+
+# pytest cache
+.pytest_cache/
+.cache/
+
+# =============================================================================
+# C++ build artifacts (local development builds, not cross-compiled)
+# =============================================================================
+layers/meta-selfhealing/recipes-core/local-agent/files/build/
+layers/meta-selfhealing/recipes-core/local-agent/files/cmake-build-*/
+*.o
+*.a
+*.so
+*.so.*
+*.out
+*.elf
+
+# =============================================================================
+# Editors and IDEs
+# =============================================================================
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# CLion / JetBrains
+.idea/
+cmake-build-debug/
+cmake-build-release/
+
+# Vim / Neovim
+*.swp
+*.swo
+*~
+.netrwhist
+tags
+.tags
+
+# Emacs
+\#*\#
+.\#*
+*.elc
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# =============================================================================
+# Operating system files
+# =============================================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+.directory
+.Trash-*
+
+# =============================================================================
+# Miscellaneous
+# =============================================================================
+
+# Compressed archives (build outputs you may have moved here)
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
+*.zip
+*.7z
+
+# Yocto image outputs (if someone copies them to the repo root)
+*.wic
+*.wic.bz2
+*.wic.xz
+*.ext4
+*.raucb
+*.squashfs
+*.jffs2
+
+# Log files
+*.log
+

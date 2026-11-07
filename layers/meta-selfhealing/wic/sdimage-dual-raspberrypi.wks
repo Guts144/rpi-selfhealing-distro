@@ -1,0 +1,10 @@
+# short-description: Create Raspberry Pi 4 dual-rootfs SD card image for RAUC A/B updates
+# long-description: Creates a partitioned SD card image for Raspberry Pi 4.
+# Boot files are located in the first vfat partition.
+# Two rootfs partitions (Slot A and Slot B) provide atomic A/B rollback.
+# A dedicated persistent data partition holds runtime configs and logs across updates.
+
+part /boot --source bootimg-partition --ondisk mmcblk0 --fstype=vfat --label boot --active --align 4096 --size 128
+part / --source rootfs --ondisk mmcblk0 --fstype=ext4 --label root0 --align 4096 --size 1536M
+part / --ondisk mmcblk0 --fstype=ext4 --label root1 --align 4096 --size 1536M
+part /data --ondisk mmcblk0 --fstype=ext4 --label data --align 4096 --size 512M
