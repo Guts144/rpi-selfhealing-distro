@@ -246,7 +246,7 @@ class PcAgent:
         time.sleep(1)
 
         print("\n" + Fore.GREEN + Style.BRIGHT + "================================================")
-        print(Fore.GREEN + Style.BRIGHT + "   ThinkPad PC AI Agent Interactive Console     ")
+        print(Fore.GREEN + Style.BRIGHT + "           sAI Agent Interactive Console     ")
         print(Fore.GREEN + Style.BRIGHT + "================================================")
         print("Available Commands:")
         print("  status         - Display live health dashboard & AI diagnostics")

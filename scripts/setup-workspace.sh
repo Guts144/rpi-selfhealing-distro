@@ -17,8 +17,8 @@ echo "[*] Checking host packages..."
 sudo apt-get update
 sudo apt-get install -y gawk wget git diffstat unzip texinfo gcc build-essential \
      chrpath socat cpio python3 python3-pip python3-pexpect xz-utils debianutils \
-     iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev \
-     pylint xterm zstd liblz4-tool libssl-dev u-boot-tools openssl
+     iputils-ping python3-git python3-jinja2 libegl1-mesa-dev libsdl1.2-dev \
+     pylint xterm zstd liblz4-dev libssl-dev u-boot-tools openssl
 
 mkdir -p "${LAYERS_DIR}"
 cd "${LAYERS_DIR}"
@@ -35,9 +35,9 @@ clone_layer() {
     fi
 }
 
-clone_layer "poky" "git://git.yoctoproject.org/poky.git"
-clone_layer "meta-raspberrypi" "git://git.yoctoproject.org/meta-raspberrypi"
-clone_layer "meta-openembedded" "git://git.openembedded.org/meta-openembedded"
+clone_layer "poky" "https://github.com/yoctoproject/poky.git"
+clone_layer "meta-raspberrypi" "https://github.com/agherzan/meta-raspberrypi.git"
+clone_layer "meta-openembedded" "https://github.com/openembedded/meta-openembedded.git"
 clone_layer "meta-rauc" "https://github.com/rauc/meta-rauc.git"
 
 # Generate development RAUC signing keys
