@@ -51,8 +51,8 @@ scripts/rauc-keys/
 # Sensitive configuration
 # =============================================================================
 # Constants.txt files contain real credentials:
-layers/meta-selfhealing/recipes-core/local-agent/files/constants.txt
-pc-agent/constants.txt
+#layers/meta-selfhealing/recipes-core/local-agent/files/constants.txt
+#pc-agent/constants.txt
 
 # =============================================================================
 # Python (PC companion agent)

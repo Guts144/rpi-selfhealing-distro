@@ -1,0 +1,24 @@
+# HiveMQ & Self-Healing Agent Configuration Constants
+# Loaded dynamically by both Raspberry Pi 4 local-agent and ThinkPad PC AI Agent.
+
+# HiveMQ Cloud Cluster URI (TLS encrypted port 8883)
+BROKER_URI=ssl://example:8883
+
+# Client ID for ThinkPad PC AI Agent (Must be unique from RPi node)
+CLIENT_ID=ai-agent
+
+# HiveMQ Cloud Credentials
+USERNAME=
+PASSWORD=
+
+# MQTT Topics
+TOPIC_TELEMETRY=rpi4/selfhealing/telemetry
+TOPIC_EVENTS=rpi4/selfhealing/events
+TOPIC_COMMANDS=rpi4/selfhealing/commands
+
+# Connectivity probe host and port
+PROBE_HOST=8.8.8.8
+PROBE_PORT=53
+
+# Telemetry broadcast interval in seconds
+TELEMETRY_INTERVAL_SEC=10

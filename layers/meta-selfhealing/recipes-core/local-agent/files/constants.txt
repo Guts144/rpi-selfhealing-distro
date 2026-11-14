@@ -1,0 +1,24 @@
+# HiveMQ & Self-Healing Agent Configuration Constants
+# You can modify these values anytime without recompiling C++ code.
+
+# Broker URI (e.g. tcp://broker.hivemq.com:1883 or ssl://<cluster>.s1.eu.hivemq.cloud:8883)
+BROKER_URI=ssl://example:8883
+
+# Client ID for this Raspberry Pi node
+CLIENT_ID=rpi4-selfhealing-agent
+
+# Optional authentication (required for HiveMQ Cloud clusters)
+USERNAME=
+PASSWORD=
+
+# MQTT Topics
+TOPIC_TELEMETRY=rpi4/selfhealing/telemetry
+TOPIC_EVENTS=rpi4/selfhealing/events
+TOPIC_COMMANDS=rpi4/selfhealing/commands
+
+# Connectivity probe host and port
+PROBE_HOST=8.8.8.8
+PROBE_PORT=53
+
+# Telemetry broadcast interval in seconds
+TELEMETRY_INTERVAL_SEC=10
